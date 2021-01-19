@@ -6,12 +6,12 @@ library(rjson)
 
 ## mortalilty.org requiers a (free) login 
 mortalilitylogin <- 'john.doe@email.com:12345566'
+mortalilitylogin <- as.character(read.table("momo.pw")[1,1])
 
-
-getAgeFraction <- function(ccode, cutoff = 65, download = T, userpwd = "") {
+getAgeFraction <- function(ccode, cutoff = 85, download = F, userpwd = mortalilitylogin) {
   
   if (download) {
-    bin <- getBinaryURL(paste0("https://www.mortality.org/hmd/zip/by_country/", ccode, ".zip"), userpwd = mortalilitylogin)
+    bin <- getBinaryURL(paste0("https://www.mortality.org/hmd/zip/by_country/", ccode, ".zip"), userpwd = userpwd)
     con <- file(paste0(ccode, ".zip"), open = "wb")
     writeBin(bin, con)
     close(con)
@@ -29,7 +29,8 @@ getAgeFraction <- function(ccode, cutoff = 65, download = T, userpwd = "") {
   names(fraction) <- max(data$Year)
   return(fraction)
 }
-
+## Check
+getAgeFraction("CHE")
 ## Read MoMo-data from prefetched JSON file
 momodata <- fromJSON(file = "zscores.json")
 ## count countries
@@ -38,7 +39,7 @@ nocountry <- length(momodata$countries$countries)
 sumexcess <- data.frame(country = rep(NA, nocountry), sumex = rep(NA, nocountry))
 for (i in 1:nocountry) {
   sumexcess[i, 1] <- momodata$countries$countries[[i]]$country
-  ## this is march 2020 (265) to jan 2021 (311)
+  ## this is march 2020 (265) to jan 2021 (311), 3 equals >65; 6 equals >85
   sumexcess[i, 2] <- mean(unlist(momodata$countries$countries[[i]]$groups[[3]]$zscore[(265):311]))
 }
 ## get mapping of abbreviations, mapping mortalility.org to MoMo
@@ -62,8 +63,8 @@ for (i in 1:nosharecountries) {
 
 plotdf <- merge(merge(sharedf, mapping), sumexcess, by.X = "country", by.y = "country")
 head(plotdf)
-with(plotdf, plot(sumex, shaer, xlim = c(-0.2, 3.5), pch = 19, col = "lightblue", xlab = "Mean Z-Score 2020 (65+)", ylab = "Anteil Population >65"))
+with(plotdf, plot(sumex, shaer, xlim = c(-0.2, 3.5), pch = 19, col = "lightblue", xlab = "Mean Z-Score 2020 (>65)", ylab = "Share Population >65",sub="MoMo Data"))
 with(plotdf, text(sumex, shaer, labels = ABBRV, cex = 0.6, pos = 4))
 
 m1 <- lm(shaer ~ sumex, plotdf)
-abline(m1)
+#abline(m1)
