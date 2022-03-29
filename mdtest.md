@@ -2,7 +2,7 @@
 
 Grundlagen von Markdown in Markdown.
 
-Die Elemente unten sind Standard-Markdown. Es gibt verschieden Spielweisen ("flavors") von Markdown, inkl. $\LaTeX$ etc.
+Die Elemente unten sind Standard-Markdown. Es gibt verschieden Spielweisen ("flavors") von Markdown, inkl. $\LaTeX$ oder [Github flavored Markdown.](https://github.github.com/gfm/)
 
 # Titel Niveau 1
 
