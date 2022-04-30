@@ -30,7 +30,7 @@ getAgeFraction <- function(ccode, cutoff = 85, download = F, userpwd = mortalili
   return(fraction)
 }
 ## Check
-getAgeFraction("CHE")
+getAgeFraction("CHE",download = T)
 ## Read MoMo-data from prefetched JSON file
 momodata <- fromJSON(file = "zscores.json")
 ## count countries
@@ -55,7 +55,7 @@ sharedf <- data.frame(ABBRV = rep(NA, nosharecountries), shaer = rep(NA, noshare
 for (i in 1:nosharecountries) {
   tryCatch({
     sharedf[i, 1] <- as.character(sharecountries[i])
-    sharedf[i, 2] <- getAgeFraction(sharecountries[i], cutoff = 65)
+    sharedf[i, 2] <- getAgeFraction(sharecountries[i], cutoff = 65,download = F)
   }, error = function(e) {
     paste("Problem with", sharecountries[i])
   })
@@ -67,4 +67,5 @@ with(plotdf, plot(sumex, shaer, xlim = c(-0.2, 3.5), pch = 19, col = "lightblue"
 with(plotdf, text(sumex, shaer, labels = ABBRV, cex = 0.6, pos = 4))
 
 m1 <- lm(shaer ~ sumex, plotdf)
-#abline(m1)
+abline(m1)
+summary(m1)
