@@ -4,12 +4,11 @@ library(rjson)
 ## Source www.mortality.org (in code) momo monitoring, json from
 ## https://www.euromomo.eu/component---src-templates-graphs-and-maps-js-ff573d2c7e588be1cead.js
 
-## mortalilty.org requiers a (free) login 
-mortalilitylogin <- 'john.doe@email.com:12345566'
-mortalilitylogin <- as.character(read.table("momo.pw")[1,1])
+## mortalilty.org requiers a (free) login
+mortalilitylogin <- "john.doe@email.com:12345566" # nolint
+mortalilitylogin <- as.character(read.table("momo.pw")[1, 1])
 
 getAgeFraction <- function(ccode, cutoff = 85, download = F, userpwd = mortalilitylogin) {
-  
   if (download) {
     bin <- getBinaryURL(paste0("https://www.mortality.org/hmd/zip/by_country/", ccode, ".zip"), userpwd = userpwd)
     con <- file(paste0(ccode, ".zip"), open = "wb")
@@ -17,7 +16,7 @@ getAgeFraction <- function(ccode, cutoff = 85, download = F, userpwd = mortalili
     close(con)
   }
   filelist <- unzip(paste0(ccode, ".zip"), list = T)
-  
+
   popfileindex <- grepl("Population.txt", ignore.case = T, filelist[, 1])
   unzip(paste0(ccode, ".zip"), file = filelist[popfileindex, 1])
   print(filelist[popfileindex, 1])
@@ -25,12 +24,12 @@ getAgeFraction <- function(ccode, cutoff = 85, download = F, userpwd = mortalili
   data$Age <- as.numeric(data$Age)
   data$Year <- as.numeric(data$Year)
   sumstat <- ddply(subset(data, Year == max(data$Year)), .(Age > cutoff), summarise, count = sum(Total))
-  fraction <- sumstat[2, 2]/sum(sumstat[, 2])
+  fraction <- sumstat[2, 2] / sum(sumstat[, 2])
   names(fraction) <- max(data$Year)
   return(fraction)
 }
 ## Check
-getAgeFraction("CHE",download = T)
+getAgeFraction("CHE", download = T)
 ## Read MoMo-data from prefetched JSON file
 momodata <- fromJSON(file = "zscores.json")
 ## count countries
@@ -53,17 +52,20 @@ nosharecountries <- length(sharecountries)
 sharedf <- data.frame(ABBRV = rep(NA, nosharecountries), shaer = rep(NA, nosharecountries))
 
 for (i in 1:nosharecountries) {
-  tryCatch({
-    sharedf[i, 1] <- as.character(sharecountries[i])
-    sharedf[i, 2] <- getAgeFraction(sharecountries[i], cutoff = 65,download = F)
-  }, error = function(e) {
-    paste("Problem with", sharecountries[i])
-  })
+  tryCatch(
+    {
+      sharedf[i, 1] <- as.character(sharecountries[i])
+      sharedf[i, 2] <- getAgeFraction(sharecountries[i], cutoff = 65, download = F)
+    },
+    error = function(e) {
+      paste("Problem with", sharecountries[i])
+    }
+  )
 }
 
 plotdf <- merge(merge(sharedf, mapping), sumexcess, by.X = "country", by.y = "country")
 head(plotdf)
-with(plotdf, plot(sumex, shaer, xlim = c(-0.2, 3.5), pch = 19, col = "lightblue", xlab = "Mean Z-Score 2020 (>65)", ylab = "Share Population >65",sub="MoMo Data"))
+with(plotdf, plot(sumex, shaer, xlim = c(-0.2, 3.5), pch = 19, col = "lightblue", xlab = "Mean Z-Score 2020 (>65)", ylab = "Share Population >65", sub = "MoMo Data"))
 with(plotdf, text(sumex, shaer, labels = ABBRV, cex = 0.6, pos = 4))
 
 m1 <- lm(shaer ~ sumex, plotdf)
