@@ -3,6 +3,8 @@ Data at
 https://www.experimental.bfs.admin.ch/expstat/en/home/innovative-methods/momo.assetdetail.23605335.html
  * [ ] Check associated confidence level
  * [ ] Read through methodolgy at bottom of https://www.experimental.bfs.admin.ch/expstat/en/home/innovative-methods/momo.html (*MoMo approach*)
+
+
   
 # Empirical Validations
 ## Against Actuarial Approach
@@ -30,6 +32,11 @@ Plot excess mortality bounds against age pyramid for several countries (see [R-C
 Plot excess mortality bounds against age pyramid for several countries for both approaches (actuarial approach and MoMo approach)
 ### Pros and Cons
 See above, as a combinations of the two.
+
+# ToDos
+ * [ ] Go through JSON file again and work out way to automate retrieval of JSON object @Simon
+
+
 
 
   
